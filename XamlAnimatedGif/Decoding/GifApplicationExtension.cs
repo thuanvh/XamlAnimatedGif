@@ -24,10 +24,17 @@ namespace XamlAnimatedGif.Decoding
             get { return GifBlockKind.SpecialPurpose; }
         }
 
-        internal static async Task<GifApplicationExtension> ReadAsync(Stream stream)
+        //internal static async Task<GifApplicationExtension> ReadAsync(Stream stream)
+        //{
+        //    var ext = new GifApplicationExtension();
+        //    await ext.ReadInternalAsync(stream).ConfigureAwait(false);
+        //    return ext;
+        //}
+
+        internal static GifApplicationExtension Read(Stream stream)
         {
             var ext = new GifApplicationExtension();
-            await ext.ReadInternalAsync(stream).ConfigureAwait(false);
+            ext.ReadInternal(stream);
             return ext;
         }
 
@@ -46,6 +53,23 @@ namespace XamlAnimatedGif.Decoding
             Array.Copy(bytes, 9, authCode, 0, 3);
             AuthenticationCode = authCode;
             Data = await GifHelpers.ReadDataBlocksAsync(stream).ConfigureAwait(false);
+        }
+
+        private void ReadInternal(Stream stream)
+        {
+            // Note: at this point, the label (0xFF) has already been read
+
+            byte[] bytes = new byte[12];
+            stream.ReadAll(bytes, 0, bytes.Length);
+            BlockSize = bytes[0]; // should always be 11
+            if (BlockSize != 11)
+                throw GifHelpers.InvalidBlockSizeException("Application Extension", 11, BlockSize);
+
+            ApplicationIdentifier = GifHelpers.GetString(bytes, 1, 8);
+            byte[] authCode = new byte[3];
+            Array.Copy(bytes, 9, authCode, 0, 3);
+            AuthenticationCode = authCode;
+            Data = GifHelpers.ReadDataBlocks(stream);
         }
     }
 }

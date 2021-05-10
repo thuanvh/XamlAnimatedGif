@@ -27,10 +27,32 @@ namespace XamlAnimatedGif.Decoding
             return descriptor;
         }
 
+        internal static GifImageDescriptor Read(Stream stream)
+        {
+            var descriptor = new GifImageDescriptor();
+            descriptor.ReadInternal(stream);
+            return descriptor;
+        }
+
         private async Task ReadInternalAsync(Stream stream)
         {
             byte[] bytes = new byte[9];
             await stream.ReadAllAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+            Left = BitConverter.ToUInt16(bytes, 0);
+            Top = BitConverter.ToUInt16(bytes, 2);
+            Width = BitConverter.ToUInt16(bytes, 4);
+            Height = BitConverter.ToUInt16(bytes, 6);
+            byte packedFields = bytes[8];
+            HasLocalColorTable = (packedFields & 0x80) != 0;
+            Interlace = (packedFields & 0x40) != 0;
+            IsLocalColorTableSorted = (packedFields & 0x20) != 0;
+            LocalColorTableSize = 1 << ((packedFields & 0x07) + 1);
+        }
+
+        private void ReadInternal(Stream stream)
+        {
+            byte[] bytes = new byte[9];
+            stream.ReadAll(bytes, 0, bytes.Length);
             Left = BitConverter.ToUInt16(bytes, 0);
             Top = BitConverter.ToUInt16(bytes, 2);
             Width = BitConverter.ToUInt16(bytes, 4);

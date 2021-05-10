@@ -18,10 +18,17 @@ namespace XamlAnimatedGif.Decoding
             get { return GifBlockKind.SpecialPurpose; }
         }
 
-        internal static async Task<GifCommentExtension> ReadAsync(Stream stream)
+        //internal static async Task<GifCommentExtension> ReadAsync(Stream stream)
+        //{
+        //    var comment = new GifCommentExtension();
+        //    await comment.ReadInternalAsync(stream).ConfigureAwait(false);
+        //    return comment;
+        //}
+
+        internal static GifCommentExtension Read(Stream stream)
         {
             var comment = new GifCommentExtension();
-            await comment.ReadInternalAsync(stream).ConfigureAwait(false);
+            comment.ReadInternal(stream);
             return comment;
         }
 
@@ -30,6 +37,15 @@ namespace XamlAnimatedGif.Decoding
             // Note: at this point, the label (0xFE) has already been read
 
             var bytes = await GifHelpers.ReadDataBlocksAsync(stream).ConfigureAwait(false);
+            if (bytes != null)
+                Text = GifHelpers.GetString(bytes);
+        }
+
+        private void ReadInternal(Stream stream)
+        {
+            // Note: at this point, the label (0xFE) has already been read
+
+            var bytes = GifHelpers.ReadDataBlocks(stream);
             if (bytes != null)
                 Text = GifHelpers.GetString(bytes);
         }

@@ -17,7 +17,12 @@ namespace XamlAnimatedGif.Decoding
 
         internal static Task<GifTrailer> ReadAsync()
         {
-            return Task.FromResult(new GifTrailer());
+            return TaskEx.FromResult(new GifTrailer());
+        }
+
+        internal static GifTrailer Read()
+        {
+            return new GifTrailer();
         }
     }
 }

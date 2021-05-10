@@ -36,7 +36,7 @@ namespace XamlAnimatedGif
             var repeatBehavior = RepeatBehavior;
 
             var ts = _timeSpans[_current];
-            await Task.Delay(ts, cancellationToken);
+            await TaskEx.Delay(ts, cancellationToken);
             _current++;
             _elapsed += ts;
 
@@ -97,7 +97,7 @@ namespace XamlAnimatedGif
             }
         }
 
-        private readonly Task _completedTask = Task.FromResult(0);
+        private readonly Task _completedTask = TaskEx.FromResult(0);
         private TaskCompletionSource<int> _pauseCompletionSource;
         public void Pause()
         {

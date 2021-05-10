@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Packaging;
 using System.Linq;
@@ -19,6 +20,13 @@ namespace XamlAnimatedGif
                 return GetNetworkStreamAsync(uri, progress);
             return GetStreamFromUriCoreAsync(uri);
         }
+
+        //public static Stream GetStreamFromUri(Uri uri, IProgress<int> progress)
+        //{
+        //    if (uri.IsAbsoluteUri && (uri.Scheme == "http" || uri.Scheme == "https"))
+        //        return GetNetworkStreamAsync(uri, progress);
+        //    return GetStreamFromUriCoreAsync(uri);
+        //}
 
         private static async Task<Stream> GetNetworkStreamAsync(Uri uri, IProgress<int> progress)
         {
@@ -55,7 +63,7 @@ namespace XamlAnimatedGif
                                 progress.Report(-1);
                         });
                 }
-                await responseStream.CopyToAsync(fileStream, absoluteProgress);
+                responseStream.CopyTo(fileStream, absoluteProgress);
             }
             catch
             {
@@ -73,14 +81,15 @@ namespace XamlAnimatedGif
                     : Application.GetResourceStream(uri);
 
                 if (sri != null)
-                    return Task.FromResult(sri.Stream);
+                    return TaskEx.FromResult(sri.Stream);
 
                 throw new FileNotFoundException("Cannot find file with the specified URI");
             }
 
             if (uri.Scheme == Uri.UriSchemeFile)
             {
-                return Task.FromResult<Stream>(File.OpenRead(uri.LocalPath));
+                Debug.WriteLine($"Open file {uri.LocalPath}");
+                return TaskEx.FromResult<Stream>(File.OpenRead(uri.LocalPath));
             }
 
             throw new NotSupportedException("Only pack:, file:, http: and https: URIs are supported");
@@ -97,7 +106,7 @@ namespace XamlAnimatedGif
             catch (FileNotFoundException)
             {
             }
-            return Task.FromResult(stream);
+            return TaskEx.FromResult(stream);
         }
 
         private static Task<Stream> CreateTempFileStreamAsync(string fileName)
@@ -105,14 +114,14 @@ namespace XamlAnimatedGif
             string path = Path.Combine(Path.GetTempPath(), fileName);
             Stream stream = File.OpenWrite(path);
             stream.SetLength(0);
-            return Task.FromResult(stream);
+            return TaskEx.FromResult(stream);
         }
 
         private static Task DeleteTempFileAsync(string fileName)
         {
             if (File.Exists(fileName))
                 File.Delete(fileName);
-            return Task.FromResult(fileName);
+            return TaskEx.FromResult(fileName);
         }
 
         private static string GetCacheFileName(Uri uri)

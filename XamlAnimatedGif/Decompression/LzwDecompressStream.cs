@@ -207,14 +207,14 @@ namespace XamlAnimatedGif.Decompression
                 Add(Sequence.ClearCode);
                 Add(Sequence.StopCode);
             }
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl(256)]
             public void Reset()
             {
                 _count = (1 << _minimumCodeLength) + 2;
                 _codeLength = _minimumCodeLength + 1;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            [MethodImpl(256)]
             public void Add(Sequence sequence)
             {
                 // Code table is full, stop adding new codes
@@ -228,7 +228,7 @@ namespace XamlAnimatedGif.Decompression
 
             public Sequence this[int index]
             {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl(256)]
                 get
                 {
                     return _table[index];
@@ -237,13 +237,13 @@ namespace XamlAnimatedGif.Decompression
 
             public int Count
             {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl(256)]
                 get { return _count; }
             }
 
             public int CodeLength
             {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                [MethodImpl(256)]
                 get { return _codeLength; }
             }
         }

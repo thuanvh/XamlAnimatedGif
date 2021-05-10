@@ -32,17 +32,17 @@ namespace XamlAnimatedGif
             }
         }
 
-        public static Task<BrushAnimator> CreateAsync(Uri sourceUri, RepeatBehavior repeatBehavior, IProgress<int> progress = null)
+        public static Task<BrushAnimator> Create(Uri sourceUri, RepeatBehavior repeatBehavior, IProgress<int> progress = null)
         {
-            return CreateAsyncCore(
+            return CreateCore(
                 sourceUri,
                 progress,
                 (stream, metadata) => new BrushAnimator(stream, sourceUri, metadata, repeatBehavior));
         }
 
-        public static Task<BrushAnimator> CreateAsync(Stream sourceStream, RepeatBehavior repeatBehavior)
+        public static BrushAnimator Create(Stream sourceStream, RepeatBehavior repeatBehavior)
         {
-            return CreateAsyncCore(
+            return CreateCore(
                 sourceStream,
                 metadata => new BrushAnimator(sourceStream, null, metadata, repeatBehavior));
         }

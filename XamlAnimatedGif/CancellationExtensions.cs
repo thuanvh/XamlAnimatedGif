@@ -8,12 +8,12 @@ namespace XamlAnimatedGif
     {
         public static async Task WithCancellationToken(this Task task, CancellationToken cancellationToken)
         {
-            await await Task.WhenAny(task, cancellationToken.WhenCanceled());
+            await await TaskEx.WhenAny(task, cancellationToken.WhenCanceled());
         }
 
         public static async Task<T> WithCancellationToken<T>(this Task<T> task, CancellationToken cancellationToken)
         {
-            var firstTaskToFinish = await Task.WhenAny(task, cancellationToken.WhenCanceled());
+            var firstTaskToFinish = await TaskEx.WhenAny(task, cancellationToken.WhenCanceled());
             if (firstTaskToFinish == task)
                 return await task;
 

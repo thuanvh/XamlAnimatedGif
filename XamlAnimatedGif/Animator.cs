@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using XamlAnimatedGif.Decoding;
 using XamlAnimatedGif.Decompression;
 using XamlAnimatedGif.Extensions;
+using System.Diagnostics;
 
 namespace XamlAnimatedGif
 {
@@ -45,7 +46,7 @@ namespace XamlAnimatedGif
             _timingManager = CreateTimingManager(metadata, repeatBehavior);
         }
 
-        internal static async Task<TAnimator> CreateAsyncCore<TAnimator>(
+        internal static async Task<TAnimator> CreateCore<TAnimator>(
             Uri sourceUri,
             IProgress<int> progress,
             Func<Stream, GifDataStream, TAnimator> create)
@@ -55,7 +56,7 @@ namespace XamlAnimatedGif
             try
             {
                 // ReSharper disable once AccessToDisposedClosure
-                return await CreateAsyncCore(stream, metadata => create(stream, metadata));
+                return CreateCore(stream, metadata => create(stream, metadata));
             }
             catch
             {
@@ -64,7 +65,20 @@ namespace XamlAnimatedGif
             }
         }
 
-        internal static async Task<TAnimator> CreateAsyncCore<TAnimator>(
+        //internal static async Task<TAnimator> CreateAsyncCore<TAnimator>(
+        //    Stream sourceStream,
+        //    Func<GifDataStream, TAnimator> create)
+        //    where TAnimator : Animator
+        //{
+        //    if (!sourceStream.CanSeek)
+        //        throw new ArgumentException("The stream is not seekable");
+        //    sourceStream.Seek(0, SeekOrigin.Begin);
+        //    var metadata = await GifDataStream.ReadAsync(sourceStream);
+        //    Debug.WriteLine($"Create animator from metadata");
+        //    return create(metadata);
+        //}
+
+        internal static TAnimator CreateCore<TAnimator>(
             Stream sourceStream,
             Func<GifDataStream, TAnimator> create)
             where TAnimator : Animator
@@ -72,7 +86,8 @@ namespace XamlAnimatedGif
             if (!sourceStream.CanSeek)
                 throw new ArgumentException("The stream is not seekable");
             sourceStream.Seek(0, SeekOrigin.Begin);
-            var metadata = await GifDataStream.ReadAsync(sourceStream);
+            var metadata = GifDataStream.Read(sourceStream);
+            Debug.WriteLine($"Create animator from metadata");
             return create(metadata);
         }
 
@@ -89,6 +104,7 @@ namespace XamlAnimatedGif
         {
             try
             {
+                Debug.WriteLine($"Animation Play");
                 if (_timingManager.IsComplete)
                 {
                     _timingManager.Reset();
@@ -128,7 +144,7 @@ namespace XamlAnimatedGif
                 cancellationToken.ThrowIfCancellationRequested();
                 var timing = _timingManager.NextAsync(cancellationToken);
                 var rendering = RenderFrameAsync(CurrentFrameIndex, cancellationToken);
-                await Task.WhenAll(timing, rendering);
+                await TaskEx.WhenAll(timing, rendering);
                 if (!timing.Result)
                     break;
                 CurrentFrameIndex = (CurrentFrameIndex + 1) % FrameCount;
