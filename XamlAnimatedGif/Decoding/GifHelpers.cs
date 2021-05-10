@@ -27,10 +27,10 @@ namespace XamlAnimatedGif.Decoding
             return GetString(bytes);
         }
 
-        public static async Task ConsumeDataBlocksAsync(Stream sourceStream, CancellationToken cancellationToken = default)
-        {
-            await CopyDataBlocksToStreamAsync(sourceStream, Stream.Null, cancellationToken);
-        }
+        //public static async Task ConsumeDataBlocksAsync(Stream sourceStream, CancellationToken cancellationToken = default)
+        //{
+        //    await CopyDataBlocksToStreamAsync(sourceStream, Stream.Null, cancellationToken);
+        //}
 
         public static void ConsumeDataBlocks(Stream sourceStream)
         {
@@ -39,30 +39,31 @@ namespace XamlAnimatedGif.Decoding
         }
         
 
-        public static async Task<byte[]> ReadDataBlocksAsync(Stream stream, CancellationToken cancellationToken = default)
-        {
-            using var ms = new MemoryStream();
-            await CopyDataBlocksToStreamAsync(stream, ms, cancellationToken);
-            return ms.ToArray();
-        }
+        //public static async Task<byte[]> ReadDataBlocksAsync(Stream stream, CancellationToken cancellationToken = default)
+        //{
+        //    using var ms = new MemoryStream();
+        //    await CopyDataBlocksToStreamAsync(stream, ms, cancellationToken);
+        //    return ms.ToArray();
+        //}
 
         public static byte[] ReadDataBlocks(Stream stream)
         {
             long position = stream.Position;
             
             
-            var b = CopyDataBlocks(stream); 
+            var b = CopyDataBlocks(stream);
+            //long b1 = stream.Position;
+            //stream.Position = position;
 
-            stream.Position = position;
-
-            using var ms = new MemoryStream();
-            CopyDataBlocksToStream1(stream, ms);
-            var a = ms.ToArray();
+            //using var ms = new MemoryStream();
+            //CopyDataBlocksToStream1(stream, ms);
+            //long b2 = stream.Position;
+            //var a = ms.ToArray();
 
             return b;
         }
 
-        public static async Task CopyDataBlocksToStreamAsync(Stream sourceStream, Stream targetStream, CancellationToken cancellationToken = default)
+        public static async Task CopyDataBlocksToStreamAsync1(Stream sourceStream, Stream targetStream, CancellationToken cancellationToken = default)
         {
             int len;
             // the length is on 1 byte, so each data sub-block can't be more than 255 bytes long
@@ -111,7 +112,19 @@ namespace XamlAnimatedGif.Decoding
                 sourceStream.ReadAll(totalBuffer, offset, len2);
                 offset += len2;
             }
+            sourceStream.ReadByte();
             return totalBuffer;
+        }
+
+        public static void CopyDataBlocks(Stream sourceStream, byte[] totalBuffer)
+        {
+            int len;
+            int offset = 0;
+            while ((len = sourceStream.ReadByte()) > 0)
+            {
+                sourceStream.ReadAll(totalBuffer, offset, len);
+                offset += len;
+            }
         }
 
         public static void CopyDataBlocksToStream1(Stream sourceStream, Stream targetStream)

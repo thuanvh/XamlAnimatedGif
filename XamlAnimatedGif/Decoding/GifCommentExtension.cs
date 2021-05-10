@@ -36,7 +36,7 @@ namespace XamlAnimatedGif.Decoding
         {
             // Note: at this point, the label (0xFE) has already been read
 
-            var bytes = await GifHelpers.ReadDataBlocksAsync(stream).ConfigureAwait(false);
+            var bytes = GifHelpers.ReadDataBlocks(stream);
             if (bytes != null)
                 Text = GifHelpers.GetString(bytes);
         }

@@ -300,10 +300,13 @@ namespace XamlAnimatedGif
             if (frameIndex < 0)
                 return;
 
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             var frame = _metadata.Frames[frameIndex];
             var desc = frame.Descriptor;
             var rect = GetFixedUpFrameRect(desc);
             using var indexStream = await GetIndexStreamAsync(frame, cancellationToken);
+            stopwatch.Stop();Debug.WriteLine($"RunTime GetIndexStreamAsync {stopwatch.Elapsed.Milliseconds} ms");stopwatch.Start();
             using (_bitmap.LockInScope())
             {
                 if (frameIndex < _previousFrameIndex)
@@ -321,7 +324,7 @@ namespace XamlAnimatedGif
                 var rows = desc.Interlace
                     ? InterlacedRows(rect.Height)
                     : NormalRows(rect.Height);
-
+                stopwatch.Stop(); Debug.WriteLine($"RunTime ClearArea {stopwatch.Elapsed.Milliseconds} ms"); stopwatch.Start();
                 foreach (int y in rows)
                 {
                     indexStream.ReadAll(indexBuffer, 0, desc.Width);
@@ -344,11 +347,13 @@ namespace XamlAnimatedGif
                     }
                     CopyToBitmap(lineBuffer, _bitmap, offset, bufferLength);
                 }
+                stopwatch.Stop(); Debug.WriteLine($"RunTime xy frame  {stopwatch.Elapsed.Milliseconds} ms"); stopwatch.Start();
                 _bitmap.AddDirtyRect(rect);
             }
 
             _previousFrame = frame;
             _previousFrameIndex = frameIndex;
+            stopwatch.Stop();Debug.WriteLine($"RunTime {stopwatch.Elapsed.Milliseconds} ms");
         }
 
         private static IEnumerable<int> NormalRows(int height)
@@ -460,9 +465,9 @@ namespace XamlAnimatedGif
             var data = frame.ImageData;
             cancellationToken.ThrowIfCancellationRequested();
             _sourceStream.Seek(data.CompressedDataStartOffset, SeekOrigin.Begin);
-            using (var ms = new MemoryStream(_indexStreamBuffer))
+            //using (var ms = new MemoryStream(_indexStreamBuffer))
             {
-                await GifHelpers.CopyDataBlocksToStreamAsync(_sourceStream, ms, cancellationToken).ConfigureAwait(false);
+                GifHelpers.CopyDataBlocks(_sourceStream, _indexStreamBuffer);
             }
             var lzwStream = new LzwDecompressStream(_indexStreamBuffer, data.LzwMinimumCodeSize);
             return lzwStream;

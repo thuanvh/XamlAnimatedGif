@@ -52,7 +52,7 @@ namespace XamlAnimatedGif.Decoding
             byte[] authCode = new byte[3];
             Array.Copy(bytes, 9, authCode, 0, 3);
             AuthenticationCode = authCode;
-            Data = await GifHelpers.ReadDataBlocksAsync(stream).ConfigureAwait(false);
+            Data = GifHelpers.ReadDataBlocks(stream);
         }
 
         private void ReadInternal(Stream stream)
