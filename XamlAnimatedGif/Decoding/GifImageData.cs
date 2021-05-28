@@ -12,12 +12,12 @@ namespace XamlAnimatedGif.Decoding
         {
         }
 
-        //internal static async Task<GifImageData> ReadAsync(Stream stream)
-        //{
-        //    var imgData = new GifImageData();
-        //    await imgData.ReadInternalAsync(stream).ConfigureAwait(false);
-        //    return imgData;
-        //}
+        internal static async Task<GifImageData> ReadAsync(Stream stream)
+        {
+            var imgData = new GifImageData();
+            await imgData.ReadInternalAsync(stream).ConfigureAwait(false);
+            return imgData;
+        }
 
         internal static GifImageData Read(Stream stream)
         {
@@ -26,12 +26,12 @@ namespace XamlAnimatedGif.Decoding
             return imgData;
         }
 
-        //private async Task ReadInternalAsync(Stream stream)
-        //{
-        //    LzwMinimumCodeSize = (byte)stream.ReadByte();
-        //    CompressedDataStartOffset = stream.Position;
-        //    await GifHelpers.ConsumeDataBlocksAsync(stream).ConfigureAwait(false);
-        //}
+        private async Task ReadInternalAsync(Stream stream)
+        {
+            LzwMinimumCodeSize = (byte)stream.ReadByte();
+            CompressedDataStartOffset = stream.Position;
+            await GifHelpers.ConsumeDataBlocksAsync(stream).ConfigureAwait(false);
+        }
 
         private void ReadInternal(Stream stream)
         {

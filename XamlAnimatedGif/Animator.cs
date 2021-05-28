@@ -65,18 +65,18 @@ namespace XamlAnimatedGif
             }
         }
 
-        //internal static async Task<TAnimator> CreateAsyncCore<TAnimator>(
-        //    Stream sourceStream,
-        //    Func<GifDataStream, TAnimator> create)
-        //    where TAnimator : Animator
-        //{
-        //    if (!sourceStream.CanSeek)
-        //        throw new ArgumentException("The stream is not seekable");
-        //    sourceStream.Seek(0, SeekOrigin.Begin);
-        //    var metadata = await GifDataStream.ReadAsync(sourceStream);
-        //    Debug.WriteLine($"Create animator from metadata");
-        //    return create(metadata);
-        //}
+        internal static async Task<TAnimator> CreateAsyncCore<TAnimator>(
+            Stream sourceStream,
+            Func<GifDataStream, TAnimator> create)
+            where TAnimator : Animator
+        {
+            if (!sourceStream.CanSeek)
+                throw new ArgumentException("The stream is not seekable");
+            sourceStream.Seek(0, SeekOrigin.Begin);
+            var metadata = await GifDataStream.ReadAsync(sourceStream);
+            Debug.WriteLine($"Create animator from metadata");
+            return create(metadata);
+        }
 
         internal static TAnimator CreateCore<TAnimator>(
             Stream sourceStream,

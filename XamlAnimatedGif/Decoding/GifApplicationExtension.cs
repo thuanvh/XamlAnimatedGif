@@ -24,12 +24,12 @@ namespace XamlAnimatedGif.Decoding
             get { return GifBlockKind.SpecialPurpose; }
         }
 
-        //internal static async Task<GifApplicationExtension> ReadAsync(Stream stream)
-        //{
-        //    var ext = new GifApplicationExtension();
-        //    await ext.ReadInternalAsync(stream).ConfigureAwait(false);
-        //    return ext;
-        //}
+        internal static async Task<GifApplicationExtension> ReadAsync(Stream stream)
+        {
+            var ext = new GifApplicationExtension();
+            await ext.ReadInternalAsync(stream).ConfigureAwait(false);
+            return ext;
+        }
 
         internal static GifApplicationExtension Read(Stream stream)
         {

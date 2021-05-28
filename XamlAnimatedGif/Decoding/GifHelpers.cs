@@ -27,28 +27,29 @@ namespace XamlAnimatedGif.Decoding
             return GetString(bytes);
         }
 
-        //public static async Task ConsumeDataBlocksAsync(Stream sourceStream, CancellationToken cancellationToken = default)
-        //{
-        //    await CopyDataBlocksToStreamAsync(sourceStream, Stream.Null, cancellationToken);
-        //}
+        public static async Task ConsumeDataBlocksAsync(Stream sourceStream, CancellationToken cancellationToken = default)
+        {
+            await MoveOverDataBlocksOfStreamAsync(sourceStream, cancellationToken);
+        }
 
         public static void ConsumeDataBlocks(Stream sourceStream)
         {
             //CopyDataBlocksToStream1(sourceStream, Stream.Null);
             MoveOverDataBlocksOfStream(sourceStream);
         }
-        
 
-        //public static async Task<byte[]> ReadDataBlocksAsync(Stream stream, CancellationToken cancellationToken = default)
-        //{
-        //    using var ms = new MemoryStream();
-        //    await CopyDataBlocksToStreamAsync(stream, ms, cancellationToken);
-        //    return ms.ToArray();
-        //}
+
+        public static async Task<byte[]> ReadDataBlocksAsync(Stream stream, CancellationToken cancellationToken = default)
+        {
+            //using var ms = new MemoryStream();
+            //await CopyDataBlocksToStreamAsync(stream, ms, cancellationToken);
+            //return ms.ToArray();
+            return await CopyDataBlocksAsync(stream, cancellationToken);
+        }
 
         public static byte[] ReadDataBlocks(Stream stream)
         {
-            long position = stream.Position;
+            //long position = stream.Position;
             
             
             var b = CopyDataBlocks(stream);
@@ -89,6 +90,17 @@ namespace XamlAnimatedGif.Decoding
                 sourceStream.Seek(len, SeekOrigin.Current);
             }
         }
+
+        public static async Task MoveOverDataBlocksOfStreamAsync(Stream sourceStream, CancellationToken cancellationToken = default)
+        {
+            int len;
+            //var position = sourceStream.Position;
+            //List<int> lenList = new List<int>();            
+            while ((len = await sourceStream.ReadByteAsync(cancellationToken)) > 0)
+            {
+                sourceStream.Seek(len, SeekOrigin.Current);
+            }
+        }
         public static byte[] CopyDataBlocks(Stream sourceStream)
         {
             int len;
@@ -116,6 +128,33 @@ namespace XamlAnimatedGif.Decoding
             return totalBuffer;
         }
 
+        public static async Task<byte[]> CopyDataBlocksAsync(Stream sourceStream, CancellationToken cancellationToken = default)
+        {
+            int len;
+            var position = sourceStream.Position;
+            List<int> lenList = new List<int>();
+            int sum = 0;
+            while ((len = await sourceStream.ReadByteAsync(cancellationToken)) > 0)
+            {
+                lenList.Add(len);
+                sum += len;
+                sourceStream.Seek(len, SeekOrigin.Current);
+            }
+
+            byte[] totalBuffer = new byte[sum];
+            sourceStream.Position = position;
+            int offset = 0;
+            for (int i = 0; i < lenList.Count; i++)
+            {
+                int len2 = lenList[i];
+                await sourceStream.ReadByteAsync(cancellationToken);
+                await sourceStream.ReadAllAsync(totalBuffer, offset, len2, cancellationToken);
+                offset += len2;
+            }
+            await sourceStream.ReadByteAsync(cancellationToken);
+            return totalBuffer;
+        }
+
         public static void CopyDataBlocks(Stream sourceStream, byte[] totalBuffer)
         {
             int len;
@@ -123,6 +162,17 @@ namespace XamlAnimatedGif.Decoding
             while ((len = sourceStream.ReadByte()) > 0)
             {
                 sourceStream.ReadAll(totalBuffer, offset, len);
+                offset += len;
+            }
+        }
+
+        public static async void CopyDataBlocksAsync(Stream sourceStream, byte[] totalBuffer)
+        {
+            int len;
+            int offset = 0;
+            while ((len = await sourceStream.ReadByteAsync()) > 0)
+            {
+                await sourceStream.ReadAllAsync(totalBuffer, offset, len);
                 offset += len;
             }
         }

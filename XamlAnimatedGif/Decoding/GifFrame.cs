@@ -24,14 +24,14 @@ namespace XamlAnimatedGif.Decoding
             get { return GifBlockKind.GraphicRendering; }
         }
 
-        //internal new static async Task<GifFrame> ReadAsync(Stream stream, IEnumerable<GifExtension> controlExtensions)
-        //{
-        //    var frame = new GifFrame();
+        internal new static async Task<GifFrame> ReadAsync(Stream stream, IEnumerable<GifExtension> controlExtensions)
+        {
+            var frame = new GifFrame();
 
-        //    await frame.ReadInternalAsync(stream, controlExtensions).ConfigureAwait(false);
+            await frame.ReadInternalAsync(stream, controlExtensions).ConfigureAwait(false);
 
-        //    return frame;
-        //}
+            return frame;
+        }
 
         internal new static GifFrame Read(Stream stream, IEnumerable<GifExtension> controlExtensions)
         {
@@ -42,19 +42,19 @@ namespace XamlAnimatedGif.Decoding
             return frame;
         }
 
-        //private async Task ReadInternalAsync(Stream stream, IEnumerable<GifExtension> controlExtensions)
-        //{
-        //    // Note: at this point, the Image Separator (0x2C) has already been read
+        private async Task ReadInternalAsync(Stream stream, IEnumerable<GifExtension> controlExtensions)
+        {
+            // Note: at this point, the Image Separator (0x2C) has already been read
 
-        //    Descriptor = await GifImageDescriptor.ReadAsync(stream).ConfigureAwait(false);
-        //    if (Descriptor.HasLocalColorTable)
-        //    {
-        //        LocalColorTable = await GifHelpers.ReadColorTableAsync(stream, Descriptor.LocalColorTableSize).ConfigureAwait(false);
-        //    }
-        //    ImageData = await GifImageData.ReadAsync(stream).ConfigureAwait(false);
-        //    Extensions = controlExtensions.ToList().AsReadOnly();
-        //    GraphicControl = Extensions.OfType<GifGraphicControlExtension>().FirstOrDefault();
-        //}
+            Descriptor = await GifImageDescriptor.ReadAsync(stream).ConfigureAwait(false);
+            if (Descriptor.HasLocalColorTable)
+            {
+                LocalColorTable = await GifHelpers.ReadColorTableAsync(stream, Descriptor.LocalColorTableSize).ConfigureAwait(false);
+            }
+            ImageData = await GifImageData.ReadAsync(stream).ConfigureAwait(false);
+            Extensions = controlExtensions.ToList().AsReadOnly();
+            GraphicControl = Extensions.OfType<GifGraphicControlExtension>().FirstOrDefault();
+        }
 
         private void ReadInternal(Stream stream, IEnumerable<GifExtension> controlExtensions)
         {

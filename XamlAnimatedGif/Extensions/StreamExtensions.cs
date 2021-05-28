@@ -55,26 +55,26 @@ namespace XamlAnimatedGif.Extensions
             return new BufferedStream(stream);
         }
 
-//        public static async Task CopyToAsync(this Stream source, Stream destination, IProgress<long> progress, int bufferSize = 81920, CancellationToken cancellationToken = default)
-//        {
-//            byte[] buffer = new byte[bufferSize];
-//            int bytesRead;
-//            long bytesCopied = 0;
-//#if LACKS_STREAM_MEMORY_OVERLOADS
-//            while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) != 0)
-//#else
-//            while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) != 0)
-//#endif
-//            {
-//#if LACKS_STREAM_MEMORY_OVERLOADS
-//                await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
-//#else
-//                await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
-//#endif
-//                bytesCopied += bytesRead;
-//                progress?.Report(bytesCopied);
-//            }
-//        }
+        public static async Task CopyToAsync(this Stream source, Stream destination, IProgress<long> progress, int bufferSize = 81920, CancellationToken cancellationToken = default)
+        {
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead;
+            long bytesCopied = 0;
+#if LACKS_STREAM_MEMORY_OVERLOADS
+            while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) != 0)
+#else
+            while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) != 0)
+#endif
+            {
+#if LACKS_STREAM_MEMORY_OVERLOADS
+                await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+#else
+                await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+#endif
+                bytesCopied += bytesRead;
+                progress?.Report(bytesCopied);
+            }
+        }
 
         public static void CopyTo(this Stream source, Stream destination, IProgress<long> progress, int bufferSize = 81920)
         {
