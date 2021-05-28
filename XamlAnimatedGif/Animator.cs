@@ -485,8 +485,8 @@ namespace XamlAnimatedGif
             _sourceStream.Seek(data.CompressedDataStartOffset, SeekOrigin.Begin);
             //using (var ms = new MemoryStream(_indexStreamBuffer))
             {
-                //GifHelpers.CopyDataBlocks(_sourceStream, _indexStreamBuffer);
-                await GifHelpers.CopyDataBlocksAsync(_sourceStream, _indexStreamBuffer);
+                GifHelpers.CopyDataBlocks(_sourceStream, _indexStreamBuffer);
+                //await GifHelpers.CopyDataBlocksAsync(_sourceStream, _indexStreamBuffer, cancellationToken);
             }
             var lzwStream = new LzwDecompressStream(_indexStreamBuffer, data.LzwMinimumCodeSize);
             return lzwStream;

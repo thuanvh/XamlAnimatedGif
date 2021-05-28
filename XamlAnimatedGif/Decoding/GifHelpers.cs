@@ -166,13 +166,13 @@ namespace XamlAnimatedGif.Decoding
             }
         }
 
-        public static async void CopyDataBlocksAsync(Stream sourceStream, byte[] totalBuffer)
+        public static async Task CopyDataBlocksAsync(Stream sourceStream, byte[] totalBuffer, CancellationToken cancellationToken = default)
         {
             int len;
             int offset = 0;
-            while ((len = await sourceStream.ReadByteAsync()) > 0)
+            while ((len = await sourceStream.ReadByteAsync(cancellationToken)) > 0)
             {
-                await sourceStream.ReadAllAsync(totalBuffer, offset, len);
+                await sourceStream.ReadAllAsync(totalBuffer, offset, len, cancellationToken);
                 offset += len;
             }
         }
