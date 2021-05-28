@@ -455,7 +455,7 @@ namespace XamlAnimatedGif
 
             try
             {
-                var animator = ImageAnimator.CreateAsync(stream, repeatBehavior, image);
+                var animator = await ImageAnimator.CreateAsync(stream, repeatBehavior, image);
                 // Check that the source hasn't changed while we were loading the animation
                 if (GetSeqNum(image) != seqNum)
                 {

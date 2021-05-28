@@ -66,6 +66,24 @@ namespace XamlAnimatedGif
         }
 
         internal static async Task<TAnimator> CreateAsyncCore<TAnimator>(
+            Uri sourceUri,
+            IProgress<int> progress,
+            Func<Stream, GifDataStream, TAnimator> create)
+            where TAnimator : Animator
+        {
+            var stream = await UriLoader.GetStreamFromUriAsync(sourceUri, progress);
+            try
+            {
+                // ReSharper disable once AccessToDisposedClosure
+                return await CreateAsyncCore(stream, metadata => create(stream, metadata));
+            }
+            catch
+            {
+                stream?.Dispose();
+                throw;
+            }
+        }
+        internal static async Task<TAnimator> CreateAsyncCore<TAnimator>(
             Stream sourceStream,
             Func<GifDataStream, TAnimator> create)
             where TAnimator : Animator
@@ -467,7 +485,8 @@ namespace XamlAnimatedGif
             _sourceStream.Seek(data.CompressedDataStartOffset, SeekOrigin.Begin);
             //using (var ms = new MemoryStream(_indexStreamBuffer))
             {
-                GifHelpers.CopyDataBlocks(_sourceStream, _indexStreamBuffer);
+                //GifHelpers.CopyDataBlocks(_sourceStream, _indexStreamBuffer);
+                await GifHelpers.CopyDataBlocksAsync(_sourceStream, _indexStreamBuffer);
             }
             var lzwStream = new LzwDecompressStream(_indexStreamBuffer, data.LzwMinimumCodeSize);
             return lzwStream;

@@ -25,15 +25,15 @@ namespace XamlAnimatedGif
 
         public static Task<ImageAnimator> CreateAsync(Uri sourceUri, RepeatBehavior repeatBehavior, IProgress<int> progress, Image image)
         {
-            return CreateCore(
+            return CreateAsyncCore(
                 sourceUri,
                 progress,
                 (stream, metadata) => new ImageAnimator(stream, sourceUri, metadata, repeatBehavior, image));
         }
 
-        public static ImageAnimator CreateAsync(Stream sourceStream, RepeatBehavior repeatBehavior, Image image)
+        public static Task<ImageAnimator> CreateAsync(Stream sourceStream, RepeatBehavior repeatBehavior, Image image)
         {
-            return CreateCore(
+            return CreateAsyncCore(
                 sourceStream,
                 metadata => new ImageAnimator(sourceStream, null, metadata, repeatBehavior, image));
         }
